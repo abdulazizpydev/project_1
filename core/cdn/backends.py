@@ -1,5 +1,4 @@
-from storages.backends.s3boto3 import S3BotoStorage
-
+from storages.backends.s3boto import S3BotoStorage
 
 class StaticRoot3Boto3Storage(S3BotoStorage):
     location = 'static'
