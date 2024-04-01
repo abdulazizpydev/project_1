@@ -6,4 +6,4 @@ whitenoise
 dj-database-url
 gunicorn
 django-storages
-boto3==1.34.74
+boto3
