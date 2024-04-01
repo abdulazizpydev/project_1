@@ -4,6 +4,18 @@ from dotenv import load_dotenv
 import dj_database_url
 import logging
 
+from .cdn.conf import (
+    AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY_ID,
+    AWS_S3_SIGNATURE_VIRSION,
+    AWS_STORAGE_BUCKET_NAME,
+    AWS_ENDPOINT_URL,
+    AWS_ENDPOINT,
+    AWS_S3_OBJECT_PARAMETRS,
+    DEFAULT_FILE_STORAGE,
+    STATICFILES_STORAGE
+)
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -12,11 +24,11 @@ load_dotenv()
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(',')
 
-WEB_URL = os.environ.get('WEB_URL')
+WEBSITE_URL = os.environ.get('WEBSITE_URL')
 
 DJNAGO_APPS = [
     "django.contrib.admin",
@@ -28,7 +40,7 @@ DJNAGO_APPS = [
 ]
 
 EXTERNAL_APPS = [
-
+    "storages",
 ]
 
 
@@ -54,10 +66,19 @@ MIDDLEWARE = [
 
 
 CSRF_TRUSTED_ORIGINS = [
-    WEB_URL,
+    f"https://www.{WEBSITE_URL}",
+    f"https://{WEBSITE_URL}",
     "http://127.0.0.1",
     "http://localhost"
 ]
+
+CSRF_COOKIE_DOMAIN = WEBSITE_URL
+CSRF_COOKIE_SECURE = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_HSTS_SECOND = 3600
+SECURE_HSTS_SECOND_SUBDOMAINS = True 
+SECURE_HSTS_PRELOAD = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
 
 
 ROOT_URLCONF = "core.urls"
@@ -125,14 +146,36 @@ USE_I18N = True
 USE_TZ = True
 
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-STATIC_URL = "/static/"
+# STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+# STATIC_URL = "/static/"
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+
+# MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+# MEDIA_URL = "/media/"
+
+
+AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY_ID = AWS_SECRET_ACCESS_KEY_ID
+AWS_STORAGE_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME
+AWS_ENDPOINT_URL = AWS_ENDPOINT_URL
+AWS_S3_OBJECT_PARAMETRS = AWS_S3_OBJECT_PARAMETRS
+AWS_QUERYSTRING_EXPIRE = 3600
+
+STATIC_URL = 'https://%s/%s/' % (AWS_STORAGE_BUCKET_NAME, AWS_ENDPOINT)
+MEDIA_URL = 'https://%s/%s/' % (AWS_STORAGE_BUCKET_NAME, AWS_ENDPOINT)
+
+
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+MEDIAFILES_DIRS = [os.path.join(BASE_DIR, "media")]
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_URL = "/media/"
+
+STATICFILES_STORAGE = STATICFILES_STORAGE
+DEFAULT_FILE_STORAGE = DEFAULT_FILE_STORAGE
+
+AWS_ENABLED = True
+AWS_S3_SECURE_URLS = True
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
